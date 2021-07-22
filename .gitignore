@@ -1,0 +1,11 @@
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+*.db
+.env
+*.pyc
+*__pycache__*
+.coverage
+.elasticbeanstalk/*
+.pytest_cache*
+.vscode
+zappa_settings.json

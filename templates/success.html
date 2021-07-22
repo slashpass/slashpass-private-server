@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Success{% endblock %}
+{% block meta %}
+<link rel="stylesheet" href="{{ url_for('static', filename='all.css') }}" />
+<script>
+window.history.pushState(null, 'Success', '/success')
+</script>
+{% endblock %}
+{% block content %}
+<div id="HeadingLine"></div>
+<div class="container success">
+    <h1>Success</h1>
+    <p>
+        Your secret was securely stored! Return to Slack and check it out by
+        doing /pass list
+    </p>
+</div>
+{% endblock %}

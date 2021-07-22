@@ -1,0 +1,269 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+  color: #333;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 20px;
+  color: #4f535d;
+}
+
+body a {
+  color: #4a90e2;
+}
+
+body .mono {
+  font-family: "Source Code Pro", monospace, monospace;
+}
+
+body .container {
+  width: 640px;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+body .container.hd {
+  width: 1080px;
+}
+
+body i.fa-github {
+  color: #333;
+  font-size: 39px;
+  line-height: 1;
+  vertical-align: bottom;
+  padding: 0 5px;
+}
+
+body #HeadingLine {
+  width: 100%;
+  background-image: linear-gradient(to right, #3e9dec, #4b54cb);
+  height: 4px;
+}
+
+body > header {
+  background-image: linear-gradient(to right, #3e9dec, #4b54cb);
+  height: 37px;
+}
+
+body > header .logo {
+  width: 48px;
+  margin-top: 5px;
+}
+
+body > header .links {
+  font-size: 0.7em;
+  float: right;
+  margin-top: 9px;
+}
+
+body > header .links a {
+  color: white;
+}
+
+body .btn {
+  font-family: inherit;
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  color: #333;
+  background-color: white;
+  border-color: #ccc;
+}
+
+body .btn:disabled {
+  background: #f9f9f9;
+  color: #a9a9a9;
+  cursor: default;
+}
+
+body .success h1 {
+  margin: 50px 0 25px 0;
+}
+
+body .contact-form .container {
+  width: 600px;
+}
+
+body .contact-form .container h4 {
+  margin-top: 50px;
+  text-align: center;
+  font-size: 1.2em;
+  letter-spacing: 0.3em;
+}
+
+body .contact-form .container .separator {
+  width: 30px;
+  height: 2px;
+  background-color: #4a90e2;
+  margin: 18px auto 8px auto;
+}
+
+body .contact-form .container form {
+  text-align: center;
+  margin: 0 0 30px 0;
+}
+
+body .contact-form .container form input,
+body .contact-form .container form textarea {
+  border: 1px solid #ccc;
+  line-height: 2;
+  margin-top: 25px;
+  padding-left: 10px;
+  width: 100%;
+}
+
+body .contact-form .container form input:focus,
+body .contact-form .container form textarea:focus {
+  outline: none !important;
+  border: 1px solid #4a90e2;
+  box-shadow: 0 0 10px #ccc;
+}
+
+body .contact-form .container form input {
+  height: 44px;
+}
+
+body .contact-form .container form textarea {
+  padding-top: 5px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+body .contact-form .container form button {
+  background: transparent;
+  border: 2px solid #4a90e2;
+  color: #4f535d;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin: 25px auto;
+  padding: 0.85em 3.1em;
+  text-transform: uppercase;
+}
+
+body input,
+body textarea,
+body button {
+  font-family: "Open Sans", sans-serif;
+}
+
+@media (max-device-width: 1140px) {
+  body {
+    font-size: 25px;
+  }
+  body > header {
+    height: 70px;
+    font-size: 1.5em;
+  }
+  body > header .logo {
+    width: 97px;
+  }
+  body .container.hd {
+    width: 90%;
+  }
+}
+
+@media (max-device-width: 700px) {
+  body {
+    font-size: 30px;
+  }
+}
+
+#Insert .center {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#Insert p {
+  line-height: 1.5;
+}
+
+#Insert .headline {
+  font-size: 1.1em;
+}
+
+#Insert .tip {
+  margin-bottom: 25px;
+  color: #848484;
+}
+
+#Insert textarea {
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  line-height: 1.42857143;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  height: auto;
+}
+
+#Insert textarea:read-only {
+  background-color: #f9f9f9;
+  color: #848484;
+}
+
+#Insert .actions {
+  margin-top: 15px;
+  text-align: right;
+}
+
+#Insert .actions button {
+  margin-left: 5px;
+}
+
+#Insert .btn-blue {
+  background-color: #4b54cb;
+  color: white;
+}
+
+#Insert .counter {
+  height: 29px;
+  margin-top: -29px;
+  text-align: right;
+  padding-right: 9px;
+  color: #848484;
+  user-select: none;
+}
+
+#Insert .counter.warning {
+  color: red;
+}
+
+#Insert .hidden {
+  display: none;
+}
+
+body.wait {
+  cursor: wait;
+}
+
+body.wait form,
+body.wait textarea,
+body.wait input,
+body.wait button {
+  cursor: wait !important;
+  user-select: none;
+}
+
+body.wait .counter {
+  display: none;
+}
