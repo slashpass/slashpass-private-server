@@ -14,7 +14,7 @@ This project was build focused in establishing a communication where the trustne
 - `/pass remove <secret>` make unreachable the secret, to complete deletion in necessary doing it manually from the s3 password storage.
 - `/pass configure <password_server_url>` this is the command used for the initial setup, it is only necessary to execute it once.
 
-[![button](https://platform.slack-edge.com/img/add_to_slack.png)](https://slack.com/oauth/authorize?client_id=2554558892.385841792964&scope=commands)
+[![button](https://platform.slack-edge.com/img/add_to_slack.png)](https://slack.com/oauth/v2/authorize?client_id=2554558892.385841792964&scope=commands)
 
 ## How to deploy
 
