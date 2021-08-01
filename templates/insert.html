@@ -1,44 +1,43 @@
-{% extends "base.html" %}
-{% block title %}Save {{ secret }} secret{% endblock %}
-{% block meta %}
+{% extends "base.html" %} {% block title %}[slashpass] {{ secret }} secret{%
+endblock %} {% block meta %}
 <link rel="stylesheet" href="{{ url_for('static', filename='all.css') }}" />
 <script
-    async
-    src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"
+  async
+  src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"
 ></script>
 <script async src="{{ url_for('static', filename='wordlist.js') }}"></script>
 <script src="{{ url_for('static', filename='insert.js') }}"></script>
-{% endblock %}
-{% block content %}
-<div id="HeadingLine"></div>
+{% endblock %} {% block content %}
 <div id="Insert" class="container">
-    <div class="center">
-        <p class="headline">
-            Paste the password or secret message or private link for
-            <b>{{ secret }}</b>.
-        </p>
-        <p class="tip">Keep sensitive info out of your email and chat logs.</p>
+  <div class="center">
+    <a
+      href="{{ home }}"
+      class="logo-link w-nav-brand"
+      aria-label="home"
+      target="black"
+      ><img
+        src="{{ url_for('static', filename='logo.svg') }}"
+        alt="slashpass"
+        class="logo-image"
+    /></a>
+    <p class="headline">Secret for <b>{{ secret }}</b></p>
+  </div>
+  <form method="post" id="InsertForm">
+    <div class="form-group">
+      <input type="checkbox" name="encrypted" class="hidden" />
+      <textarea name="public_key" class="hidden">{{ public_key }}</textarea>
+      <textarea name="secret" class="mono" cols="30" rows="10"></textarea>
+      <div class="counter"></div>
     </div>
-    <form method="post" id="InsertForm">
-        <div class="form-group">
-            <input type="checkbox" name="encrypted" class="hidden" />
-            <textarea name="public_key" class="hidden">
-{{ public_key }}</textarea
-            >
-            <textarea name="secret" class="mono" cols="30" rows="10"></textarea>
-            <div class="counter"></div>
-        </div>
-        <div class="actions">
-            <button name="generator1" type="button" class="btn">
-                Generate a human readable password
-            </button>
-            <button name="generator2" type="button" class="btn">
-                Generate a random password
-            </button>
-            <button name="create" type="submit" class="btn btn-blue">
-                Create
-            </button>
-        </div>
-    </form>
+    <div class="actions">
+      <button name="generator1" type="button" class="btn">
+        Generate a human readable password
+      </button>
+      <button name="generator2" type="button" class="btn">
+        Generate a random password
+      </button>
+      <button name="create" type="submit" class="btn btn-blue">Create</button>
+    </div>
+  </form>
 </div>
 {% endblock %}

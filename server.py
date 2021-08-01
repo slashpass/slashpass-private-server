@@ -160,6 +160,7 @@ def insert(token):
 
     return render_template(
         "insert.html",
+        home=SLACK_SERVER,
         secret=re.sub("[a-zA-Z0-9]+\/", "", path, 1),
         public_key=bytes.decode(public_key),
     )
