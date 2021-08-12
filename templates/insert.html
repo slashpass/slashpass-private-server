@@ -1,13 +1,14 @@
-{% extends "base.html" %} {% block title %}[slashpass] {{ secret }} secret{%
-endblock %} {% block meta %}
-<link rel="stylesheet" href="{{ url_for('static', filename='all.css') }}" />
+{% extends "base.html" %}
+{% block title %}[slashpass] {{ secret }} secret{% endblock %}
+{% block meta %}
 <script
   async
   src="https://cdn.jsdelivr.net/npm/node-forge@0.10.0/dist/forge.min.js"
 ></script>
 <script async src="{{ url_for('static', filename='wordlist.js') }}"></script>
 <script src="{{ url_for('static', filename='insert.js') }}"></script>
-{% endblock %} {% block content %}
+{% endblock %}
+{% block content %}
 <div id="Insert" class="container">
   <div class="center">
     <a

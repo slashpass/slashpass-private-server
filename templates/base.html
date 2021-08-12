@@ -12,10 +12,13 @@
       rel="shortcut icon"
       type="image/x-icon"
     />
+    <link rel="stylesheet" href="{{ url_for('static', filename='all.css') }}" />
     {% block meta %}{% endblock %}
   </head>
   <body>
+    {% block banner %}
     <div id="Banner">Keep sensitive info out of your email and chat logs.</div>
+    {% endblock %}
     <div id="HeadingLine"></div>
     {% block content %}{% endblock %}
   </body>

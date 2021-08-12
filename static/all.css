@@ -213,6 +213,33 @@ body button {
   display: none;
 }
 
+#Status {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 17px 18px;
+}
+
+#Status .tag {
+  border: solid 1px #808080;
+  margin-left: 7px;
+  padding: 1px 7px 1px 6px;
+}
+
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#Status .point {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #4dd00a;
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+
 body.wait {
   cursor: wait;
 }

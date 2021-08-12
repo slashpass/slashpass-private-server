@@ -70,6 +70,12 @@ def _save_backup_copy(bucket, channel, key):
     return True
 
 
+@server.route("/", methods=["GET"])
+def status_page():
+    return render_template("status.html")
+
+
+
 @server.route("/public_key", methods=["GET"])
 def get_public_key():
     return public_key
