@@ -75,6 +75,23 @@ def status_page():
     return render_template("status.html")
 
 
+@server.route("/stats", methods=["GET"])
+def stats_page():
+    bucket = s3.list_objects(Bucket=PASSWORD_STORAGE)
+    channels = []
+    total_secrets = 0
+    for obj in bucket["Contents"]:
+        if not re.compile(".+/\.").match(obj["Key"]):
+            total_secrets += 1
+
+        channel = re.compile("^[A-Z0-9]+/").match(obj["Key"])
+        if channel:
+            channels.append(channel[0])
+
+    return render_template(
+        "admin.html", total_secrets=total_secrets - 1, total_channels=len(set(channels))
+    )
+
 
 @server.route("/public_key", methods=["GET"])
 def get_public_key():

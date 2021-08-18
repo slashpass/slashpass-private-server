@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}slashpass | stats{% endblock %} {%
+block content %}
+<div id="Admin">
+  <div class="container">
+    <h1>Stats</h1>
+    <div class="analytics">
+      <div class="box">
+        <small>Total secrets</small>
+        <span class="stat number">{{ total_secrets }}/20</span>
+      </div>
+      <div class="box mid">
+        <small>Total channels with secrets</small>
+        <span class="stat number">{{ total_channels }}</span>
+      </div>
+      <div class="box">
+        <small>Plan</small>
+        <span class="stat">Teams</span>
+        <button>Upgrade</button>
+      </div>
+    </div>
+    <div class="activity">
+      <h2>Recent Activity</h2>
+      <ul>
+        <li>
+          <span class="time">5 min ago</span>
+          <span class="log"
+            ><i>mreyes</i> created secret for <i>netlify</i></span
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
