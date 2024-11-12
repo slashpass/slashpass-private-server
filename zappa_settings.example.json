@@ -1,20 +1,36 @@
 {
-    "server": {
-        "aws_region": "us-east-1",
-        "app_function": "server.server",
-        "profile_name": "default",
-        "project_name": "slashpass-server",
-        "runtime": "python3.8",
-        "s3_bucket": "mycompany-slashpass-app",
-        "environment_variables": {
-            "VERSION": "1",
-            "AWS_ACCESS_KEY_ID": "AK111111111111111111",
-            "AWS_SECRET_ACCESS_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-            "ONETIMESECRET_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-            "ONETIMESECRET_USER": "my-onetimesecret-user@provider.com",
-            "PASSWORD_STORAGE": "mycompany-slashpass-storage",
-            "BIP39":
-                "bip39 recovery phrase def twelve words mnemonic code for generating deterministic keys"
-        }
+  "server": {
+    "aws_region": "us-east-1",
+    "app_function": "server.server",
+    "profile_name": "default",
+    "project_name": "slashpass-server",
+    "runtime": "python3.10",
+    "s3_bucket": "mycompany-slashpass-app",
+    "environment_variables": {
+      "VERSION": "1",
+      "AWS_ACCESS_KEY_ID": "AK111111111111111111",
+      "AWS_SECRET_ACCESS_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ONETIMESECRET_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ONETIMESECRET_USER": "my-onetimesecret-user@provider.com",
+      "PASSWORD_STORAGE": "mycompany-slashpass-storage",
+      "BIP39": "bip39 recovery phrase def twelve words mnemonic code for generating deterministic keys"
     }
+  },
+  "dev": {
+    "aws_region": "us-east-1",
+    "app_function": "server.server",
+    "profile_name": "default",
+    "project_name": "slashpass-server",
+    "runtime": "python3.10",
+    "s3_bucket": "mycompany-slashpass-app",
+    "environment_variables": {
+      "VERSION": "1",
+      "AWS_ACCESS_KEY_ID": "AK111111111111111111",
+      "AWS_SECRET_ACCESS_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ONETIMESECRET_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ONETIMESECRET_USER": "my-onetimesecret-user@provider.com",
+      "PASSWORD_STORAGE": "mycompany-slashpass-storage",
+      "BIP39": "bip39 recovery phrase def twelve words mnemonic code for generating deterministic keys"
+    }
+  }
 }

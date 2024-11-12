@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "slashpass-private-server"
+version = "1"
+description = ""
+authors = ["Mauricio <m@slashpass.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.0.3"
+requests = "^2.32.3"
+boto3 = "^1.35.58"
+zappa = "^0.59.0"
+onetimesecret = "^1"
+deterministic-rsa-keygen = "^0.0.1"
+
+[tool.poetry.scripts]
+start-server = "slashpass_private_server.run_server:main"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

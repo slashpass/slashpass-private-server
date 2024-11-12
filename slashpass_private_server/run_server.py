@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import time
@@ -10,6 +11,14 @@ from onetimesecret import OneTimeSecretCli
 from rsa import decrypt, encrypt, generate_key
 
 server = Flask(__name__)
+
+
+if (
+    os.environ.get("AWS_LAMBDA_FUNCTION_NAME") is None
+):  # Ensures app is NOT running on Lambda
+    json_data = open("zappa_settings.json")
+    env_vars = json.load(json_data)["dev"]["environment_variables"]
+    os.environ |= env_vars
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_REGION = os.environ.get("AWS_S3_REGION", "us-east-1")
@@ -34,20 +43,19 @@ s3 = boto3.client(
 def _get_encryption_key():
     bucket = PASSWORD_STORAGE
     key = "slack.slashpass.id_rsa.pub"
-    encryption_key_url = "{}/public_key".format(SLACK_SERVER)
+    encryption_key_url = f"{SLACK_SERVER}/public_key"
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
     except ClientError as e:
-        if e.response["Error"]["Code"] == "NoSuchKey":
-            r = requests.get(encryption_key_url)
-            if r.status_code != requests.codes.ok:
-                raise Exception(
-                    "Unable to retrieve {} from {}".format(key, encryption_key_url)
-                )
-            s3.put_object(Bucket=bucket, Body=str.encode(r.text), Key=key)
-            return r.text
-        else:
+        if e.response["Error"]["Code"] != "NoSuchKey":
             raise e
+        r = requests.get(encryption_key_url)
+        if r.status_code != requests.codes.ok:
+            raise Exception(
+                f"Unable to retrieve {key} from {encryption_key_url}"
+            ) from e
+        s3.put_object(Bucket=bucket, Body=str.encode(r.text), Key=key)
+        return r.text
     return response["Body"].read()
 
 
@@ -55,12 +63,10 @@ def _save_backup_copy(bucket, channel, key):
     path = key.split("/")
     file = path.pop()
     route = "/".join(path) + "/" if path else ""
-    new_key = "{}/{}.{}.{}".format(channel, route, file, int(time.time()))
+    new_key = f"{channel}/{route}.{file}.{int(time.time())}"
     try:
         s3.copy_object(
-            Bucket=bucket,
-            CopySource="{}/{}/{}".format(bucket, channel, key),
-            Key=new_key,
+            Bucket=bucket, CopySource=f"{bucket}/{channel}/{key}", Key=new_key
         )
     except ClientError as e:
         if e.response["Error"]["Code"] in ["NoSuchKey", "NoSuchBucket"]:
@@ -84,8 +90,7 @@ def stats_page():
         if not re.compile(".+/\.").match(obj["Key"]):
             total_secrets += 1
 
-        channel = re.compile("^[A-Z0-9]+/").match(obj["Key"])
-        if channel:
+        if channel := re.compile("^[A-Z0-9]+/").match(obj["Key"]):
             channels.append(channel[0])
 
     return render_template(
@@ -149,7 +154,7 @@ def list(prefix):
 
 @server.route("/insert/<token>", methods=["GET", "POST"])
 def insert(token):
-    retrieve_token_data = "{}/t/{}".format(SLACK_SERVER, token)
+    retrieve_token_data = f"{SLACK_SERVER}/t/{token}"
     response = requests.get(retrieve_token_data)
 
     if response.status_code != 200:
@@ -173,12 +178,11 @@ def insert(token):
             _save_backup_copy(bucket, *path.split("/", 1))
             s3.put_object(**kargs)
         except ClientError as e:
-            if e.response["Error"]["Code"] == "NoSuchBucket":
-                s3.create_bucket(Bucket=bucket)
-                s3.put_object(**kargs)
-            else:
+            if e.response["Error"]["Code"] != "NoSuchBucket":
                 raise e
 
+            s3.create_bucket(Bucket=bucket)
+            s3.put_object(**kargs)
         return render_template("success.html")
 
     return render_template(
@@ -198,7 +202,7 @@ def remove():
     if not _save_backup_copy(bucket, channel, app):
         abort(403)
 
-    s3.delete_object(Bucket=bucket, Key="{}/{}".format(channel, app))
+    s3.delete_object(Bucket=bucket, Key=f"{channel}/{app}")
     return "ok"
 
 
@@ -207,5 +211,9 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 
-if __name__ == "__main__":
+def main():
     server.run(host="0.0.0.0", port=8090)
+
+
+if __name__ == "__main__":
+    main()
