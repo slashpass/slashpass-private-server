@@ -15,6 +15,7 @@ onetimesecret = "^1"
 deterministic-rsa-keygen = "^0.0.1"
 
 [tool.poetry.scripts]
+generate-bip39 = "utilities.generate_bip39:main"
 start-server = "slashpass_private_server.run_server:main"
 
 [tool.poetry.group.dev.dependencies]
