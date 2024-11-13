@@ -13,18 +13,24 @@ from rsa import decrypt, encrypt, generate_key
 server = Flask(__name__)
 
 
+class EncryptionKeyRetrievalError(Exception):
+    """Exception raised when an encryption key cannot be retrieved from the server."""
+
+
 if (
     os.environ.get("AWS_LAMBDA_FUNCTION_NAME") is None
-):  # Ensures app is NOT running on Lambda
-    json_data = open("zappa_settings.json")
-    env_vars = json.load(json_data)["dev"]["environment_variables"]
-    os.environ |= env_vars
+):  # If the app is NOT running on Lambda, load the development environment variables
+    with open("zappa_settings.json") as json_data:
+        env_vars = json.load(json_data)["dev"]["environment_variables"]
+        os.environ |= env_vars
+
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_REGION = os.environ.get("AWS_S3_REGION", "us-east-1")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-ONETIMESECRET_KEY = os.environ.get("ONETIMESECRET_KEY")
-ONETIMESECRET_USER = os.environ.get("ONETIMESECRET_USER")
+ONETIMESECRET_KEY = os.environ.get("ONETIMESECRET_KEY", None)
+ONETIMESECRET_USER = os.environ.get("ONETIMESECRET_USER", None)
+ONETIMESECRET_REGION = os.environ.get("ONETIMESECRET_REGION", "us")
 PASSWORD_STORAGE = os.environ.get("PASSWORD_STORAGE")
 SLACK_SERVER = os.environ.get("SLACK_SERVER", "https://slack.slashpass.co")
 
@@ -40,40 +46,52 @@ s3 = boto3.client(
 )
 
 
-def _get_encryption_key():
-    bucket = PASSWORD_STORAGE
-    key = "slack.slashpass.id_rsa.pub"
-    encryption_key_url = f"{SLACK_SERVER}/public_key"
+def _get_s3_object(bucket: str, key: str) -> bytes:
+    """Retrieve an object from S3, or return None if not found."""
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
+        return response["Body"].read()
     except ClientError as e:
-        if e.response["Error"]["Code"] != "NoSuchKey":
-            raise e
-        r = requests.get(encryption_key_url)
-        if r.status_code != requests.codes.ok:
-            raise Exception(
-                f"Unable to retrieve {key} from {encryption_key_url}"
-            ) from e
-        s3.put_object(Bucket=bucket, Body=str.encode(r.text), Key=key)
-        return r.text
-    return response["Body"].read()
+        if e.response["Error"]["Code"] in ["NoSuchKey", "NoSuchBucket"]:
+            return None
+        raise
 
 
-def _save_backup_copy(bucket, channel, key):
-    path = key.split("/")
-    file = path.pop()
-    route = "/".join(path) + "/" if path else ""
-    new_key = f"{channel}/{route}.{file}.{int(time.time())}"
+def _get_encryption_key() -> bytes:
+    """Retrieve the public encryption key, or fetch and store it if missing."""
+    bucket, key = PASSWORD_STORAGE, "slack.slashpass.id_rsa.pub"
+
+    if encryption_key := _get_s3_object(bucket, key):
+        return encryption_key
+
+    # Fetch from SLACK_SERVER if not found in S3
+    try:
+        encryption_key_url = f"{SLACK_SERVER}/public_key"
+        response = requests.get(encryption_key_url, timeout=5)
+        response.raise_for_status()
+        s3.put_object(Bucket=bucket, Body=response.text.encode(), Key=key)
+        return response.text.encode()
+    except requests.RequestException as e:
+        raise EncryptionKeyRetrievalError(
+            f"Unable to retrieve {key} from {encryption_key_url}: {str(e)}"
+        )
+
+
+def _save_backup_copy(bucket: str, channel: str, key: str) -> bool:
+    """Creates a timestamped backup copy of an object in an S3 bucket"""
+    path_parts = key.split("/")
+    file = path_parts.pop()
+    route = "/".join(path_parts) + "/" if path_parts else ""
+    backup_key = f"{channel}/{route}.{file}.{int(time.time())}"
     try:
         s3.copy_object(
-            Bucket=bucket, CopySource=f"{bucket}/{channel}/{key}", Key=new_key
+            Bucket=bucket, CopySource=f"{bucket}/{channel}/{key}", Key=backup_key
         )
+        return True
     except ClientError as e:
         if e.response["Error"]["Code"] in ["NoSuchKey", "NoSuchBucket"]:
             return False
-        else:
-            raise e
-    return True
+        raise
 
 
 @server.route("/", methods=["GET"])
@@ -84,17 +102,17 @@ def status_page():
 @server.route("/stats", methods=["GET"])
 def stats_page():
     bucket = s3.list_objects(Bucket=PASSWORD_STORAGE)
-    channels = []
+    channels = set()
     total_secrets = 0
     for obj in bucket["Contents"]:
-        if not re.compile(".+/\.").match(obj["Key"]):
+        if not re.compile(r".+/\.").match(obj["Key"]):
             total_secrets += 1
 
         if channel := re.compile("^[A-Z0-9]+/").match(obj["Key"]):
-            channels.append(channel[0])
+            channels.add(channel[0])
 
     return render_template(
-        "admin.html", total_secrets=total_secrets - 1, total_channels=len(set(channels))
+        "admin.html", total_secrets=total_secrets - 1, total_channels=len(channels)
     )
 
 
@@ -105,23 +123,20 @@ def get_public_key():
 
 @server.route("/onetime_link", methods=["POST"])
 def get_onetime_link():
-    cli = OneTimeSecretCli(ONETIMESECRET_USER, ONETIMESECRET_KEY)
+    cli = OneTimeSecretCli(ONETIMESECRET_USER, ONETIMESECRET_KEY, ONETIMESECRET_REGION)
     try:
-        response = s3.get_object(Bucket=PASSWORD_STORAGE, Key=request.form["secret"])
-    except ClientError as e:
-        if e.response["Error"]["Code"] in ["NoSuchKey", "NoSuchBucket"]:
-            abort(404)
-        else:
-            raise e
-
-    secret = decrypt(response["Body"].read(), private_key)
-    encryption_key = _get_encryption_key()
-    # the link is encrypted to be decrypted by the slack server
-    return encrypt(cli.create_link(secret), encryption_key)
+        if response := _get_s3_object(PASSWORD_STORAGE, request.form["secret"]):
+            secret = decrypt(response, private_key)
+            encryption_key = _get_encryption_key()
+            # the link is encrypted to be decrypted by the slack server
+            return encrypt(cli.create_link(secret), encryption_key)
+        abort(404)
+    except ClientError:
+        abort(500)
 
 
 @server.route("/list/<prefix>", methods=["POST"])
-def list(prefix):
+def list_secrets(prefix):
     output = ""
     chunk_size = 214  # assuming 2048 bits key
     try:
@@ -130,24 +145,24 @@ def list(prefix):
         if e.response["Error"]["Code"] == "NoSuchBucket":
             s3.create_bucket(Bucket=PASSWORD_STORAGE)
         else:
-            raise e
+            raise
     else:
         if "Contents" in bucket:
             output = "\n".join(
                 [
                     x["Key"]
                     for x in bucket["Contents"]
-                    if not re.match(".+\/\.\w+", x["Key"])
+                    if not re.match(r".+\/\.\w+", x["Key"])
                 ]
             )
 
-    output = str.encode(output)
+    output_bytes = output.encode()
     encryption_key = _get_encryption_key()
 
     return b"".join(
         [
-            encrypt(output[i : i + chunk_size], encryption_key, True)
-            for i in range(0, len(output), chunk_size)
+            encrypt(output_bytes[i : i + chunk_size], encryption_key, True)
+            for i in range(0, len(output_bytes), chunk_size)
         ]
     )
 
@@ -155,12 +170,12 @@ def list(prefix):
 @server.route("/insert/<token>", methods=["GET", "POST"])
 def insert(token):
     retrieve_token_data = f"{SLACK_SERVER}/t/{token}"
-    response = requests.get(retrieve_token_data)
+    response = requests.get(retrieve_token_data, timeout=5)
 
     if response.status_code != 200:
         abort(400 if request.method == "POST" else 404)
 
-    path = bytes.decode(response.content)
+    path = response.text.strip()
 
     if request.method == "POST":
         bucket = PASSWORD_STORAGE
@@ -171,7 +186,7 @@ def insert(token):
             secret = encrypt(secret, public_key)
         kargs = {
             "Bucket": bucket,
-            "Body": str.encode(secret),  # encrypted secret
+            "Body": secret.encode(),  # encrypted secret
             "Key": path,
         }
         try:
@@ -179,7 +194,7 @@ def insert(token):
             s3.put_object(**kargs)
         except ClientError as e:
             if e.response["Error"]["Code"] != "NoSuchBucket":
-                raise e
+                raise
 
             s3.create_bucket(Bucket=bucket)
             s3.put_object(**kargs)
@@ -188,7 +203,7 @@ def insert(token):
     return render_template(
         "insert.html",
         home=SLACK_SERVER,
-        secret=re.sub("[a-zA-Z0-9]+\/", "", path, 1),
+        secret=re.sub(r"[a-zA-Z0-9]+\/", "", path, 1),
         public_key=bytes.decode(public_key),
     )
 

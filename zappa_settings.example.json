@@ -12,6 +12,7 @@
       "AWS_SECRET_ACCESS_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "ONETIMESECRET_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "ONETIMESECRET_USER": "my-onetimesecret-user@provider.com",
+      "ONETIMESECRET_REGION": "us",
       "PASSWORD_STORAGE": "mycompany-slashpass-storage",
       "BIP39": "bip39 recovery phrase def twelve words mnemonic code for generating deterministic keys"
     }
@@ -29,6 +30,7 @@
       "AWS_SECRET_ACCESS_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "ONETIMESECRET_KEY": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "ONETIMESECRET_USER": "my-onetimesecret-user@provider.com",
+      "ONETIMESECRET_REGION": "us",
       "PASSWORD_STORAGE": "mycompany-slashpass-storage",
       "BIP39": "bip39 recovery phrase def twelve words mnemonic code for generating deterministic keys"
     }
