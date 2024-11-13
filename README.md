@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/talpor/password-scale.svg?branch=master)](https://travis-ci.org/talpor/password-scale)
 
-slashpass is a Slack command to manage shared passwords between the members of a channel in Slack.
+Slashpass is a Slack command designed to facilitate secure password sharing among members of a Slack channel.
 
-This project was build focused in establishing a communication where the trustness between parties is not required, using the asymmetric algorithm RSA to share encrypted information point to point and where the only participant allowed to read the stored passwords is the _Password Server_, who is different and independent for each client.
+This project focuses on enabling communication in environments where mutual trust between parties is not required. Slashpass uses RSA, an asymmetric encryption algorithm, to securely share encrypted information point-to-point. Only the dedicated and independent Password Server for each client has the ability to decrypt and read the stored passwords, ensuring that only authorized participants can access sensitive information.
 
 ## Commands
 
@@ -29,7 +29,7 @@ In order to be efficient with the resource management and facilitate the deploy 
 
 #### Installed software
 
-- pipenv
+- poetry
 
 ### Step-by-step guide
 
@@ -42,19 +42,37 @@ In order to be efficient with the resource management and facilitate the deploy 
 
 Done! now you will need to configure your server in Slack, using the command `/pass configure <new_server_url>` to retrieve your server URL use the command `zappa status` and check the _API Gateway URL_. If you have any error using the command after configuration use `zappa tail` command to check the server logs.
 
-### Local run
+### Local development environment
 
-poetry run start-server
+To set up your local development environment, follow these steps:
+
+1. Install Dependencies
+   To install all necessary dependencies, including development-specific ones, use the following command:
+
+`poetry install --with dev`
+
+2. Start the Server
+   When running the server locally, it will load environment variables from the zappa_settings.json file, specifically from the settings section labeled "dev". Modify these variables as needed for local development purposes.
+
+To start the server, use:
+
+`poetry run start-server`
+
+3. Run Tests
+   To execute the test suite, run:
+
+`poetry run pytest tests`
 
 ### Environment variables table
 
-| Key                           | Description                                                                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| AWS_ACCESS_KEY_ID             | Your AWS public key, this key only needs permission to use S3                                                                  |
-| AWS_SECRET_ACCESS_KEY         | Your AWS private key                                                                                                           |
-| AWS_S3_REGION (optional)      | The AWS region where the password storage bucket will be created, the default value is `us-east-1`                             |
-| ENCRYPTION_KEY_URL (optional) | This is the url to retrieve the _Slack Server_ public key, the default value is `https://slack.slashpass.co/public_key`        |
-| ONETIMESECRET_KEY             | Your One-Time Secret API key                                                                                                   |
-| ONETIMESECRET_USER            | Your One-Time Secret user name                                                                                                 |
-| PASSWORD_STORAGE              | Unique name for your password storage bucket                                                                                   |
-| BIP39                         | Mnemonic code for generating deterministic keys, specification: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki |
+| Key                             | Description                                                                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS_ACCESS_KEY_ID               | Your AWS public key with permissions to access S3.                                                                                      |
+| AWS_SECRET_ACCESS_KEY           | Your AWS private key.                                                                                                                   |
+| AWS_S3_REGION (optional)        | The AWS region where the password storage bucket will be created. Defaults to us-east-1.                                                |
+| ENCRYPTION_KEY_URL (optional)   | URL to retrieve the Slack Server public key. Defaults to https://slack.slashpass.co/public_key.                                         |
+| ONETIMESECRET_KEY (optional)    | API key for your One-Time Secret account.                                                                                               |
+| ONETIMESECRET_USER (optional)   | Username for your One-Time Secret account.                                                                                              |
+| ONETIMESECRET_REGION (optional) | Region for your One-Time Secret account, could be `us` or `eu`. Defaults to us.                                                         |
+| PASSWORD_STORAGE                | Unique name for the S3 bucket where passwords will be stored.                                                                           |
+| BIP39                           | Mnemonic phrase used for generating deterministic keys, [Specification](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) |
