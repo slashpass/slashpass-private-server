@@ -231,17 +231,17 @@ files = [
 
 [[package]]
 name = "deterministic-rsa-keygen"
-version = "0.0.1"
+version = "1.0"
 description = "generate deterministic RSA key pair and perform encrypt and decrypt operations"
 optional = false
-python-versions = ">=3.6"
+python-versions = "<4.0,>=3.10"
 files = [
-    {file = "deterministic-rsa-keygen-0.0.1.tar.gz", hash = "sha256:7a00187f8ff33b04082eba3ecc86b1d38eaa5f71185b46f24e8c9d6061387e3b"},
-    {file = "deterministic_rsa_keygen-0.0.1-py3-none-any.whl", hash = "sha256:26605b1d1f4c9b85509f31c6d2f983a0b3938547f07a36abdc796222f8f717b3"},
+    {file = "deterministic_rsa_keygen-1.0-py3-none-any.whl", hash = "sha256:b56b7a9c5fbd2797e277b139cce8c19b5577e64b6bda62b2309303170ea65848"},
+    {file = "deterministic_rsa_keygen-1.0.tar.gz", hash = "sha256:03fe628ce0867f2ee878602a59f6c89eacf15bde0352dbc218b7313f8fe4328a"},
 ]
 
 [package.dependencies]
-pycryptodome = ">=3.10"
+pycryptodome = ">=3.21.0,<4.0.0"
 
 [[package]]
 name = "durationpy"
@@ -843,4 +843,4 @@ wheel = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4a5cc9092724a0b71088a887fc0055e8d1ae023e86e15d48fd8fcbc1101ec870"
+content-hash = "928696c74d0efa1c46b48d5c18ad128e78619917c37268ebcc956d831232f43b"
