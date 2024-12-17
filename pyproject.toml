@@ -13,6 +13,8 @@ boto3 = "^1.35.58"
 zappa = "^0.59.0"
 onetimesecret = "^1"
 deterministic-rsa-keygen = "^1.0"
+mnemonic = "^0.21"
+setuptools = "^75.6.0"
 
 [tool.poetry.scripts]
 generate-bip39 = "utilities.generate_bip39:main"
