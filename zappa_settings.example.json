@@ -1,7 +1,7 @@
 {
   "server": {
     "aws_region": "us-east-1",
-    "app_function": "server.server",
+    "app_function": "slashpass_private_server.run_server.server",
     "profile_name": "default",
     "project_name": "slashpass-server",
     "runtime": "python3.10",
@@ -19,7 +19,7 @@
   },
   "dev": {
     "aws_region": "us-east-1",
-    "app_function": "server.server",
+    "app_function": "slashpass_private_server.run_server.server",
     "profile_name": "default",
     "project_name": "slashpass-server",
     "runtime": "python3.10",

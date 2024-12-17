@@ -33,14 +33,55 @@ In order to be efficient with the resource management and facilitate the deploy 
 
 ### Step-by-step guide
 
-- Clone _slashpass-private-server_ project `git clone git@github.com:slashpass/slashpass-private-server.git` and do `cd slashpass-private-server`
-- Install requirements `poetry install`
-- Create _zappa_settings.json_ file based on _zappa_settings.example.json_ `cp zappa_settings.example.json zappa_settings.json`
-- Modify _"s3_bucket"_ and _"environment_variables"_ variables in the new _zappa_settings.json_ file, replacing each value for your owns (for the _"environment_variables"_ see the table below)
-- Configure the awscli credential if necessary (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
-- Deploy the server `poetry run zappa deploy`
+Follow these steps to set up and deploy the Slashpass Private Server.
 
-Done! now you will need to configure your server in Slack, using the command `/pass configure <new_server_url>` to retrieve your server URL use the command `zappa status` and check the _API Gateway URL_. If you have any error using the command after configuration use `zappa tail` command to check the server logs.
+#### 1. Clone the Repository
+
+Clone the slashpass-private-server project and navigate to the project directory:
+
+```
+git clone git@github.com:slashpass/slashpass-private-server.git
+cd slashpass-private-server
+```
+
+#### 2. Install Dependencies
+
+Install the required dependencies using Poetry:
+
+```
+poetry install
+```
+
+#### 3. Create the zappa_settings.json File
+
+Copy the example configuration file to create your own zappa_settings.json:
+
+```
+cp zappa_settings.example.json zappa_settings.json
+```
+
+#### 4. Update the Configuration
+
+Edit the zappa_settings.json file and update the following fields:
+
+s3_bucket: Replace with your own S3 bucket name.
+environment_variables: Replace values as needed. See the table below for the required environment variables.
+
+#### 5. Configure AWS CLI Credentials
+
+Ensure your AWS CLI credentials are configured. If needed, refer to the official AWS documentation:
+
+[Configure AWS CLI Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+
+#### 6. Deploy the Server
+
+Deploy the **_server stage_** using Zappa:
+
+```
+poetry run zappa deploy server
+```
+
+Done! now you will need to configure your server in Slack, using the command `/pass configure <new_server_url>` to retrieve your server URL use the command `poetry run zappa status server` and check the _API Gateway URL_. If you have any error using the command after configuration use `poetry run zappa tail` command to check the server logs.
 
 ### Local development environment
 
@@ -65,14 +106,14 @@ To start the server, use:
 
 ### Environment variables table
 
-| Key                             | Description                                                                                                                             |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| AWS_ACCESS_KEY_ID               | Your AWS public key with permissions to access S3.                                                                                      |
-| AWS_SECRET_ACCESS_KEY           | Your AWS private key.                                                                                                                   |
-| AWS_S3_REGION (optional)        | The AWS region where the password storage bucket will be created. Defaults to us-east-1.                                                |
-| ENCRYPTION_KEY_URL (optional)   | URL to retrieve the Slack Server public key. Defaults to https://slack.slashpass.co/public_key.                                         |
-| ONETIMESECRET_KEY (optional)    | API key for your One-Time Secret account.                                                                                               |
-| ONETIMESECRET_USER (optional)   | Username for your One-Time Secret account.                                                                                              |
-| ONETIMESECRET_REGION (optional) | Region for your One-Time Secret account, could be `us` or `eu`. Defaults to us.                                                         |
-| PASSWORD_STORAGE                | Unique name for the S3 bucket where passwords will be stored.                                                                           |
-| BIP39                           | Mnemonic phrase used for generating deterministic keys, [Specification](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) |
+| Key                             | Description                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| AWS_ACCESS_KEY_ID               | Your AWS public key with permissions to access S3.                                                             |
+| AWS_SECRET_ACCESS_KEY           | Your AWS private key.                                                                                          |
+| AWS_S3_REGION (optional)        | The AWS region where the password storage bucket will be created. Defaults to us-east-1.                       |
+| ENCRYPTION_KEY_URL (optional)   | URL to retrieve the Slack Server public key. Defaults to https://slack.slashpass.co/public_key.                |
+| ONETIMESECRET_KEY (optional)    | API key for your One-Time Secret account.                                                                      |
+| ONETIMESECRET_USER (optional)   | Username for your One-Time Secret account.                                                                     |
+| ONETIMESECRET_REGION (optional) | Region for your One-Time Secret account, could be `us` or `eu`. Defaults to us.                                |
+| PASSWORD_STORAGE                | Unique name for the S3 bucket where passwords will be stored.                                                  |
+| BIP39                           | Mnemonic phrase used for generating deterministic keys. You can generate one using: poetry run generate-bip39. |
