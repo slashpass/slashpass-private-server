@@ -5,10 +5,12 @@ import time
 
 import boto3
 import requests
+import urllib3
 from botocore.exceptions import ClientError
 from flask import Flask, abort, render_template, request
 from onetimesecret import OneTimeSecretCli
 from rsa import decrypt, encrypt, generate_key
+from urllib3.exceptions import HTTPError
 
 server = Flask(__name__)
 
@@ -65,16 +67,20 @@ def _get_encryption_key() -> bytes:
         return encryption_key
 
     # Fetch from SLACK_SERVER if not found in S3
+    encryption_key_url = f"{SLACK_SERVER}/public_key"
+    http = urllib3.PoolManager()
+
     try:
-        encryption_key_url = f"{SLACK_SERVER}/public_key"
-        response = requests.get(encryption_key_url, timeout=5)
-        response.raise_for_status()
-        s3.put_object(Bucket=bucket, Body=response.text.encode(), Key=key)
-        return response.text.encode()
-    except requests.RequestException as e:
+        response = http.request("GET", encryption_key_url, timeout=5)
+        if response.status != 200:
+            raise HTTPError(f"Request failed with status {response.status}")
+    except (HTTPError, urllib3.exceptions.RequestError) as e:
         raise EncryptionKeyRetrievalError(
             f"Unable to retrieve {key} from {encryption_key_url}: {str(e)}"
-        )
+        ) from e
+
+    s3.put_object(Bucket=bucket, Body=response.data, Key=key)
+    return response.data
 
 
 def _save_backup_copy(bucket: str, channel: str, key: str) -> bool:
